@@ -1,4 +1,5 @@
 import io.restassured.path.json.JsonPath;
+import org.testng.Assert;
 
 public class ComplexJsonParse {
     //Diving in Depth-Automating REST API's
@@ -21,6 +22,26 @@ public class ComplexJsonParse {
             System.out.println(js.getString("courses[" + i + "].title"));
             System.out.println(js.getString("courses[" + i + "].price"));
         }
+
+        //5. Print No of copies sold by RPA course
+
+        for (int i = 0;i<count;i++) {
+            if(js.getString("courses[" + i + "].title").contains("RPA")) {
+                System.out.println(js.getString("courses[" + i + "].copies"));
+                break;
+            }
+        }
+
+        //6. Verify if sum of all course prices mathces with purchase amount.
+        int total = 0;
+        for (int i = 0;i<count;i++) {
+            total += ( js.getInt("courses[" + i + "].price") * js.getInt("courses[" + i + "].copies"));
+
+            System.out.println(total);
+
+        }
+        Assert.assertEquals(total, js.getInt("dashboard.purchaseAmount"));
+
 
 
     }
