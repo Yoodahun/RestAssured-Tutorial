@@ -1,7 +1,6 @@
 import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
 import org.testng.Assert;
-import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -10,16 +9,16 @@ import java.nio.file.Paths;
 
 import static io.restassured.RestAssured.given;
 
-public class DynamicJson {
+public class StaticJson {
 
-    @Test(dataProvider = "BooksData")
-    public void addBook(String isbn, String aisle) {
+    @Test
+    public void addBook() throws IOException {
         RestAssured.baseURI = "http://216.10.245.166";
         String response = given().log().all()
                 .header("Content-Type", "application/json")
-                .body(Payload.addBook(isbn,aisle))
-        .when().post("/Library/Addbook.php")
-        .then().log().all()
+                .body(generaterStringFromResource("src/main/resources/addBook.json"))
+                .when().post("/Library/Addbook.php")
+                .then().log().all()
                 .statusCode(200)
                 .extract().response().asString();
 
@@ -27,18 +26,8 @@ public class DynamicJson {
         Assert.assertEquals(jp.get("Msg"), "successfully added");
     }
 
-    //delete book
-    @DataProvider(name = "BooksData")
-    public Object[][] getData() {
-
-        return new Object[][]{
-            {"asdds", "9321"},
-            {"deer", "2213"},
-            {"panda", "323"}
-
-        };
-
+    public static String generaterStringFromResource(String path) throws IOException {
+        return new String(Files.readAllBytes(Paths.get(path)));
     }
-
 
 }
